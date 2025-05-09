@@ -10,8 +10,8 @@ pipeline {
         // Stage 1: Clone Repository
         stage('Clone Code') {
             steps {
-                git branch: 'dev',
-                     url: 'https://github.com/CeeyIT-Solutions/JavaWeb3.git'
+                git branch: 'latest',
+                     url: 'https://github.com/SASowah/JavaWeb3.git'
             }
         }
 
