@@ -14,14 +14,6 @@ pipeline {
                      url: 'https://github.com/SASowah/JavaWeb3.git'
             }
         }
-
-        // Stage 2: Build Java Application
-        stage('Maven Build') {
-            steps {
-                sh 'mvn clean package'
-            }
-        }
-
         // Stage 3: Build Docker Image
         stage('Docker Build') {
             steps {
