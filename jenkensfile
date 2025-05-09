@@ -7,11 +7,18 @@ pipeline {
     }
 
     stages {
-        // Stage 1: Clone the correct repo
+        // Stage 1: Clone Repository
         stage('Clone Code') {
             steps {
-                git branch: 'latest',
-                    url: 'https://github.com/SASowah/JavaWeb3.git'
+                git branch: 'dev',
+                     url: 'https://github.com/CeeyIT-Solutions/JavaWeb3.git'
+            }
+        }
+
+        // Stage 2: Build Java Application
+        stage('Maven Build') {
+            steps {
+                sh 'mvn clean package'
             }
         }
 
@@ -24,7 +31,7 @@ pipeline {
             }
         }
 
-        // Stage 4: Push Docker Image to Docker Hub
+        // Stage 4: Push to Docker Hub
         stage('Docker Push') {
             steps {
                 script {
@@ -32,6 +39,20 @@ pipeline {
                         docker.image("${DOCKER_IMAGE}:${env.BUILD_NUMBER}").push()
                         docker.image("${DOCKER_IMAGE}:latest").push()
                     }
+                }
+            }
+        }
+
+        // ✅ Stage 5: Deploy Docker Container (use port 8000 to avoid Jenkins conflict)
+        stage('Run Container') {
+            steps {
+                script {
+                    // Stop any existing container using the same image (optional)
+                    sh """
+                        docker ps -q --filter ancestor=${DOCKER_IMAGE}:latest | xargs -r docker stop
+                        docker ps -a -q --filter ancestor=${DOCKER_IMAGE}:latest | xargs -r docker rm
+                        docker run -d -p 8000:8080 ${DOCKER_IMAGE}:latest
+                    """
                 }
             }
         }
@@ -43,13 +64,13 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "✅ Pipeline succeeded! Image available at: ${DOCKER_IMAGE}"
+            echo "Pipeline succeeded! App should be running on port 8000"
         }
         failure {
-            echo "❌ Pipeline failed! Check logs for details."
+            echo "Pipeline failed! Check logs for errors."
             mail to: 'samsoo18@yahoo.com',
                  subject: "Pipeline Failed: ${currentBuild.fullDisplayName}",
-                 body: "Check build logs at ${env.BUILD_URL}"
+                 body: "Check build ${env.BUILD_URL}"
         }
     }
 }
