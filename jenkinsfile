@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'samsow/java-calculator-app'
-        DOCKER_CREDENTIALS_ID = 'docker-hub-creds' // Must match Jenkins credential ID
+        DOCKER_CREDENTIALS_ID = 'docker-hub-creds' //Jenkins credential ID
     }
 
     stages {
